@@ -47,6 +47,7 @@ var (
 	minMasquerades     = flag.Int("min-masquerades", 1000, "Require that the resulting config contain at least this many masquerades per provider")
 	maxMasquerades     = flag.Int("max-masquerades", 1000, "Limit the number of masquerades to include in config per provider")
 	blacklistFile      = flag.String("blacklist", "", "Path to file containing list of blacklisted domains, which will be excluded from the configuration even if present in the masquerades file (e.g. blacklist.txt)")
+	mappingFile        = flag.String("mapping", "provider_map.yaml", "Path to file containing provider mapping")
 	proxiedSitesDir    = flag.String("proxiedsites", "proxiedsites", "Path to directory containing proxied site lists, which will be combined and proxied by Lantern")
 	minFreq            = flag.Float64("minfreq", 3.0, "Minimum frequency (percentage) for including CA cert in list of trusted certs, defaults to 3.0%")
 	numberOfWorkers    = flag.Int("numworkers", 50, "Number of worker threads")
@@ -74,49 +75,28 @@ var (
 	providers     map[string]*provider // supported fronting providers
 )
 
-func init() {
+func populateProviders() {
 	flag.Var(&masqueradesInFiles, "masquerades", "Path to file containing list of masquerades to use, with one space-separated 'ip domain provider' set per line (e.g. masquerades.txt)")
 	flag.Var(&enabledProviders, "enable-provider", "Enable fronting provider")
-
+	mappingData, err := ioutil.ReadFile(*mappingFile)
+	if err != nil {
+		panic("Mapping file doesn't exist")
+	}
+	var mapping map[string]ProviderConfig
+	err = yaml.Unmarshal(mappingData, &mapping)
+	if err != nil {
+		panic(fmt.Sprintf("Mapping file is invalid: %v", err))
+	}
 	providers = make(map[string]*provider)
-	providers["cloudfront"] = newProvider(
-		"http://d157vud77ygy87.cloudfront.net/ping",
-		map[string]string{
-			"api.getiantem.org":                "d2n32kma9hyo9f.cloudfront.net",
-			"api-staging.getiantem.org":        "d16igwq64x5e11.cloudfront.net",
-			"borda.lantern.io":                 "d157vud77ygy87.cloudfront.net",
-			"config.getiantem.org":             "d2wi0vwulmtn99.cloudfront.net",
-			"config-staging.getiantem.org":     "d33pfmbpauhmvd.cloudfront.net",
-			"geo.getiantem.org":                "d3u5fqukq7qrhd.cloudfront.net",
-			"globalconfig.flashlightproxy.com": "d24ykmup0867cj.cloudfront.net",
-			"update.getlantern.org":            "d2yl1zps97e5mx.cloudfront.net",
-			"github.com":                       "d2yl1zps97e5mx.cloudfront.net",
-			"github-production-release-asset-2e65be.s3.amazonaws.com": "d37kom4pw4aa7b.cloudfront.net",
-			"mandrillapp.com":                   "d2rh3u0miqci5a.cloudfront.net",
-			"replica-search.lantern.io":         "d7kybcoknm3oo.cloudfront.net",
-			"replica-search-staging.lantern.io": "d36vwf34kviguu.cloudfront.net",
-		},
-		&config.ValidatorConfig{RejectStatus: []int{403}},
-	)
-	providers["akamai"] = newProvider(
-		"https://fronted-ping.dsa.akamai.getiantem.org/ping",
-		map[string]string{
-			"api.getiantem.org":                "api.dsa.akamai.getiantem.org",
-			"api-staging.getiantem.org":        "api-staging.dsa.akamai.getiantem.org",
-			"borda.lantern.io":                 "borda.dsa.akamai.getiantem.org",
-			"config.getiantem.org":             "config.dsa.akamai.getiantem.org",
-			"config-staging.getiantem.org":     "config-staging.dsa.akamai.getiantem.org",
-			"geo.getiantem.org":                "geo.dsa.akamai.getiantem.org",
-			"globalconfig.flashlightproxy.com": "globalconfig.dsa.akamai.getiantem.org",
-			"update.getlantern.org":            "update.dsa.akamai.getiantem.org",
-			"github.com":                       "github.dsa.akamai.getiantem.org",
-			"github-production-release-asset-2e65be.s3.amazonaws.com": "github-release-asset.dsa.akamai.getiantem.org",
-			"mandrillapp.com":                   "mandrillapp.dsa.akamai.getiantem.org",
-			"replica-search.lantern.io":         "replica-search.dsa.akamai.lantern.io",
-			"replica-search-staging.lantern.io": "replica-search-staging.dsa.akamai.lantern.io",
-		},
-		&config.ValidatorConfig{RejectStatus: []int{403}},
-	)
+	for name, p := range mapping {
+		providers[name] = newProvider(p.Ping, p.Mapping, &config.ValidatorConfig{RejectStatus: []int{p.RejectStatus}})
+	}
+}
+
+type ProviderConfig struct {
+	Ping         string            `yaml:"ping"`
+	RejectStatus int               `yaml:"rejectStatus"`
+	Mapping      map[string]string `yaml:"mapping"`
 }
 
 type filter map[string]bool
@@ -171,6 +151,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	populateProviders()
 	numcores := runtime.NumCPU()
 	log.Debugf("Using all %d cores on machine", numcores)
 	runtime.GOMAXPROCS(numcores)
