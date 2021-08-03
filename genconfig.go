@@ -79,10 +79,24 @@ func init() {
 	flag.Var(&enabledProviders, "enable-provider", "Enable fronting provider")
 
 	providers = make(map[string]*provider)
-	providers[config.CloudfrontProviderID] = newProvider(
-		config.CloudfrontTestURL,
-		config.CloudfrontHostAliases(),
-		&config.ValidatorConfig{RejectStatus: config.CloudfrontBadStatus()},
+	providers["cloudfront"] = newProvider(
+		"http://d157vud77ygy87.cloudfront.net/ping",
+		map[string]string{
+			"api.getiantem.org":                "d2n32kma9hyo9f.cloudfront.net",
+			"api-staging.getiantem.org":        "d16igwq64x5e11.cloudfront.net",
+			"borda.lantern.io":                 "d157vud77ygy87.cloudfront.net",
+			"config.getiantem.org":             "d2wi0vwulmtn99.cloudfront.net",
+			"config-staging.getiantem.org":     "d33pfmbpauhmvd.cloudfront.net",
+			"geo.getiantem.org":                "d3u5fqukq7qrhd.cloudfront.net",
+			"globalconfig.flashlightproxy.com": "d24ykmup0867cj.cloudfront.net",
+			"update.getlantern.org":            "d2yl1zps97e5mx.cloudfront.net",
+			"github.com":                       "d2yl1zps97e5mx.cloudfront.net",
+			"github-production-release-asset-2e65be.s3.amazonaws.com": "d37kom4pw4aa7b.cloudfront.net",
+			"mandrillapp.com":                   "d2rh3u0miqci5a.cloudfront.net",
+			"replica-search.lantern.io":         "d7kybcoknm3oo.cloudfront.net",
+			"replica-search-staging.lantern.io": "d36vwf34kviguu.cloudfront.net",
+		},
+		&config.ValidatorConfig{RejectStatus: []int{403}},
 	)
 	providers["akamai"] = newProvider(
 		"https://fronted-ping.dsa.akamai.getiantem.org/ping",
@@ -100,23 +114,6 @@ func init() {
 			"mandrillapp.com":                   "mandrillapp.dsa.akamai.getiantem.org",
 			"replica-search.lantern.io":         "replica-search.dsa.akamai.lantern.io",
 			"replica-search-staging.lantern.io": "replica-search-staging.dsa.akamai.lantern.io",
-		},
-		&config.ValidatorConfig{RejectStatus: []int{403}},
-	)
-	providers["edgecast"] = newProvider(
-		"https://fronted-ping.edgecast.getiantem.org/ping",
-		map[string]string{
-			"api.getiantem.org":                "api.edgecast.getiantem.org",
-			"api-staging.getiantem.org":        "api-staging.edgecast.getiantem.org",
-			"borda.lantern.io":                 "borda.edgecast.getiantem.org",
-			"config.getiantem.org":             "config.edgecast.getiantem.org",
-			"config-staging.getiantem.org":     "config-staging.edgecast.getiantem.org",
-			"geo.getiantem.org":                "geo.edgecast.getiantem.org",
-			"globalconfig.flashlightproxy.com": "globalconfig.edgecast.getiantem.org",
-			"update.getlantern.org":            "update.edgecast.getiantem.org",
-			"github.com":                       "github.edgecast.getiantem.org",
-			"github-production-release-asset-2e65be.s3.amazonaws.com": "github-release-asset.edgecast.getiantem.org",
-			"mandrillapp.com": "mandrillapp.edgecast.getiantem.org",
 		},
 		&config.ValidatorConfig{RejectStatus: []int{403}},
 	)
