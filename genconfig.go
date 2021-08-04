@@ -76,8 +76,6 @@ var (
 )
 
 func populateProviders() {
-	flag.Var(&masqueradesInFiles, "masquerades", "Path to file containing list of masquerades to use, with one space-separated 'ip domain provider' set per line (e.g. masquerades.txt)")
-	flag.Var(&enabledProviders, "enable-provider", "Enable fronting provider")
 	mappingData, err := ioutil.ReadFile(*mappingFile)
 	if err != nil {
 		panic("Mapping file doesn't exist")
@@ -144,6 +142,9 @@ func (ss *stringsFlag) Set(value string) error {
 }
 
 func main() {
+	flag.Var(&masqueradesInFiles, "masquerades", "Path to file containing list of masquerades to use, with one space-separated 'ip domain provider' set per line (e.g. masquerades.txt)")
+	flag.Var(&enabledProviders, "enable-provider", "Enable fronting provider")
+
 	flag.Parse()
 
 	if *help {
