@@ -3,18 +3,18 @@ module github.com/getlantern/genconfig
 go 1.16
 
 require (
-	github.com/getlantern/flashlight v0.0.0-20210802120815-82d219722f18
-	github.com/getlantern/fronted v0.0.0-20201229165541-138879ce456e
+	github.com/getlantern/flashlight v0.0.0-20211222120638-fda017ef4214
+	github.com/getlantern/fronted v0.0.0-20210806163345-971f7e536246
 	github.com/getlantern/golog v0.0.0-20210606115803-bce9f9fe5a5f
 	github.com/getlantern/keyman v0.0.0-20210622061955-aa0d47d4932c
-	github.com/getlantern/tlsdialer/v3 v3.0.1
+	github.com/getlantern/tlsdialer/v3 v3.0.3
 	github.com/getlantern/yaml v0.0.0-20190801163808-0c9bb1ebf426
-	github.com/refraction-networking/utls v0.0.0-20200729012536-186025ac7b77
+	github.com/refraction-networking/utls v1.0.0
 )
 
-replace github.com/lucas-clemente/quic-go => github.com/getlantern/quic-go v0.7.1-0.20210422183034-b5805f4c233b
+replace github.com/lucas-clemente/quic-go => github.com/getlantern/quic-go v0.0.0-20211103152344-c9ce5bfd4854
 
-replace github.com/refraction-networking/utls => github.com/getlantern/utls v0.0.0-20200903013459-0c02248f7ce1
+replace github.com/refraction-networking/utls => github.com/getlantern/utls v0.0.0-20211116192935-1abdc4b1acab
 
 replace github.com/anacrolix/go-libutp => github.com/getlantern/go-libutp v1.0.3-0.20210202003624-785b5fda134e
 
@@ -25,13 +25,10 @@ replace github.com/keighl/mandrill => github.com/getlantern/mandrill v0.0.0-2019
 
 replace github.com/google/netstack => github.com/getlantern/netstack v0.0.0-20210430190606-84f1a4e5b695
 
-//replace github.com/getlantern/yinbi-server => ../yinbi-server
-
-//replace github.com/getlantern/auth-server => ../auth-server
-
-//replace github.com/getlantern/lantern-server => ../lantern-server
-
 // For https://github.com/crawshaw/sqlite/pull/112 and https://github.com/crawshaw/sqlite/pull/103.
 replace crawshaw.io/sqlite => github.com/getlantern/sqlite v0.3.3-0.20210215090556-4f83cf7731f0
 
 replace github.com/eycorsican/go-tun2socks => github.com/getlantern/go-tun2socks v1.16.12-0.20201218023150-b68f09e5ae93
+
+// v0.5.6 has a security issue and using require leaves a reference to it in go.sum
+replace github.com/ulikunitz/xz => github.com/ulikunitz/xz v0.5.8
