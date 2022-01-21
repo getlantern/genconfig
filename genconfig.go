@@ -171,7 +171,7 @@ func main() {
 	loadFallbacks()
 	loadFtVersion()
 
-	yamlTmpl := loadTemplate("cloud.yaml.tmpl")
+	yamlTmpl := string(cloudYamlTemplate)
 
 	go feedMasquerades()
 	cas, masqs := coalesceMasquerades()

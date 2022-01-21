@@ -3,13 +3,15 @@ module github.com/getlantern/genconfig
 go 1.16
 
 require (
-	github.com/getlantern/flashlight v0.0.0-20211222120638-fda017ef4214
+	github.com/getlantern/flashlight v0.0.0-20220120195645-6263b0296ba2
+	github.com/getlantern/flashlight/20220120 v0.0.0-20220120120707-bd7a62c26092
 	github.com/getlantern/fronted v0.0.0-20210806163345-971f7e536246
 	github.com/getlantern/golog v0.0.0-20210606115803-bce9f9fe5a5f
 	github.com/getlantern/keyman v0.0.0-20210622061955-aa0d47d4932c
 	github.com/getlantern/tlsdialer/v3 v3.0.3
 	github.com/getlantern/yaml v0.0.0-20190801163808-0c9bb1ebf426
 	github.com/refraction-networking/utls v1.0.0
+	github.com/stretchr/testify v1.7.0
 )
 
 replace github.com/lucas-clemente/quic-go => github.com/getlantern/quic-go v0.0.0-20211103152344-c9ce5bfd4854
@@ -32,3 +34,6 @@ replace github.com/eycorsican/go-tun2socks => github.com/getlantern/go-tun2socks
 
 // v0.5.6 has a security issue and using require leaves a reference to it in go.sum
 replace github.com/ulikunitz/xz => github.com/ulikunitz/xz v0.5.8
+
+// Include specific versions of flashlight for backward compatibility testing
+replace github.com/getlantern/flashlight/20220120 => github.com/getlantern/flashlight v0.0.0-20220120120707-bd7a62c26092
